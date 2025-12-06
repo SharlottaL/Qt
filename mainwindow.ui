@@ -76,7 +76,7 @@
      <string>Duration:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_Time">
+   <widget class="QLabel" name="label_Position">
     <property name="geometry">
      <rect>
       <x>20</x>

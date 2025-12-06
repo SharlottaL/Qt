@@ -25,10 +25,18 @@ private slots:
 
 	void on_pushButton_Stop_clicked();
 
-	void on_Volume_sliderMoved(int position);
+	//void on_Volume_sliderMoved(int position);
 
-	void positionChanged(qint64 position);
-	void durationChanged(qint64 duration);
+	void on_positionChanged(qint64 position);
+	void on_durationChanged(qint64 duration);
+
+	void on_pushButton_Mute_clicked();
+
+	void on_Volume_valueChanged(int value);
+
+	void on_horizontalSliderTime_valueChanged(qint64 value);
+
+	void on_horizontalSliderTime_sliderMoved(qint64 position);
 
 private:
     Ui::MainWindow *ui;
