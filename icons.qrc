@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>ico/music_piano_cello_1753.ico</file>
+        <file>ico/mp3_97516.ico</file>
+    </qresource>
+</RCC>
