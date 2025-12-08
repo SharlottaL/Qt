@@ -23,29 +23,85 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(m_player, &QMediaPlayer::positionChanged, this, &MainWindow::on_positionChanged);
 	connect(m_player, &QMediaPlayer::durationChanged, this, &MainWindow::on_durationChanged);
 	connect(this->ui->horizontalSliderTime, &QSlider::sliderMoved,this, &MainWindow::on_horizontalSliderTime_sliderMoved);
+	///Playlist init:
+	m_playlist_model=new QStandardItemModel(this);
+	this->ui->tableViewPlaylist->setModel(m_playlist_model);
+	m_playlist_model->setHorizontalHeaderLabels(QStringList()<<"Audio track"<<"File path"<<"Duration");
+	this->ui->tableViewPlaylist->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	this->ui->tableViewPlaylist->setSelectionBehavior(QAbstractItemView::SelectRows);
+	this->ui->tableViewPlaylist->hideColumn(1);
+	int duration_width=64;
+	this->ui->tableViewPlaylist->setColumnWidth(3,duration_width);
+	this->ui->tableViewPlaylist->setColumnWidth(0,this->ui->tableViewPlaylist->width()-duration_width*1.7);
+	m_playlist = new QMediaPlaylist(m_player);
+	m_player->setPlaylist(m_playlist);
+
+
 	ui->Volume->setRange(0,100);
 	m_player->setVolume(30);
 	ui->label_Volume->setText(QString("Volume: ").append(QString::number(m_player->volume())));
 	ui->Volume->setValue(m_player->volume());
+	connect(this->ui->pushButton_Prev, &QPushButton::clicked, this-> m_playlist,&QMediaPlaylist::previous);
+	connect(this->ui->pushButton_Next, &QPushButton::clicked, this-> m_playlist,&QMediaPlaylist::next);
+	connect(this->m_playlist, &QMediaPlaylist::currentIndexChanged, this->ui->tableViewPlaylist,&QTableView::selectRow);
+	connect(this->ui->tableViewPlaylist,&QTableView::doubleClicked,
+			[this](const QModelIndex& index){m_playlist->setCurrentIndex(index.row()); this ->m_player->play();}
+	);
+	connect(this->m_player, &QMediaPlayer::mediaChanged,
+			[this](const QMediaContent& media)
+	{
+		this->ui->label_File ->setText(media.canonicalUrl().toString());
+		this->setWindowTitle(this->ui->label_File->text().split('/').last());
+	});
 }
-
 MainWindow::~MainWindow()
 {
+	delete m_playlist;
+	delete m_playlist_model;
 	delete m_player;
     delete ui;
 }
 
+void MainWindow::loadFileToPlaylist(const QString& filename)
+{
+	m_playlist->addMedia(QUrl(filename));
+	QList<QStandardItem*> items;
+	items.append(new QStandardItem(QDir(filename).dirName()));
+	items.append(new QStandardItem(filename));
+	QMediaPlayer player;
+	player.setMedia(QUrl(filename));
+	player.play();
+
+	items.append(new QStandardItem(QTime::fromMSecsSinceStartOfDay(player.duration()).toString("mm:ss")));
+	player.pause();
+	m_playlist_model->appendRow(items);
+}
+
 void MainWindow::on_pushButton_Add_clicked()
 {
-	QString file = QFileDialog::getOpenFileName
-		   (
+//	QString file = QFileDialog::getOpenFileName
+//		   (
+//				this,
+//				"Open file",
+//				"C:\muz",
+//				"Audio files (*.mp3 *.flac);; MP-3 (*.mp3);; Flac(*.flac)"
+//		   );
+//	ui->label_File->setText(QString("File:").append(file));
+//	this->m_player->setMedia(QUrl(file));
+
+	QStringList files = QFileDialog::getOpenFileNames
+			(
 				this,
 				"Open file",
 				"",
-				"Audio files (*.mp3 *.flac);; MP-3 (*.mp3);; Flac(*.flac)"
-		   );
-	ui->label_File->setText(QString("File:").append(file));
-	this->m_player->setMedia(QUrl(file));
+				"Audio files (*.mp3 *.flac *.flacc);; MP-3 (*.mp3);; Flac(*.flac *.flacc)"
+				);
+
+	for(QString file:files)
+	{
+	  loadFileToPlaylist(file);
+	}
+
 }
 
 void MainWindow::on_pushButton_Play_clicked()
