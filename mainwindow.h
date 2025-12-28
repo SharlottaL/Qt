@@ -3,8 +3,15 @@
 
 #include <QMainWindow>
 #include <QMediaPlayer>
-#include<QMediaPlaylist>
-#include<QStandardItemModel>
+#include <QMediaPlaylist>
+#include <QStandardItemModel>
+#include <QAudioProbe>
+#include <QAudioBuffer>
+#include <QTimer>
+#include <QDockWidget>
+
+// Включаем QCustomPlot
+#include "qcustomplot.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,8 +29,12 @@ public:
 	void savePlaylist(const QString& filename);
 	void loadPlaylist(const QString& filename);
 	QVector<QString> loadPlaylistToArray(const QString& filename);
-
-
+	void setupEqualizer();
+	bool isAudioExtension(const QString& filename);
+void drawEqualizer(QPainter &painter);
+//void paintEvent(QPaintEvent *event) override;
+void onFramePaint();
+bool eventFilter(QObject *watched, QEvent *event);
 private slots:
 	void on_pushButton_Add_clicked();
 
@@ -56,6 +67,10 @@ private slots:
 
 
 	void on_pushButton_Dir_clicked();
+	void updateEqualizer();
+
+
+
 
 private:
 	void traverseDirectories(const QString& dirname);
@@ -67,6 +82,20 @@ private:
 
 	bool shuffle;
 	bool loop;
+
+	QCustomPlot *m_plot;
+	   QTimer *m_equalizerTimer;
+	   QVector<double> m_equalizerData;
+	   QVector<double> m_frequencyBands;
+
+	   QWidget *m_equalizerWidget;
+		  bool m_equalizerActive;
+		  QVector<int> m_equalizerLevels;
+
+		  // Методы для эквалайзера
+
+
+
 
 
 };
