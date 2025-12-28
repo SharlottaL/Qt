@@ -9,8 +9,6 @@
 #include <QAudioBuffer>
 #include <QTimer>
 #include <QDockWidget>
-
-// Включаем QCustomPlot
 #include "qcustomplot.h"
 
 QT_BEGIN_NAMESPACE
@@ -32,7 +30,6 @@ public:
 	void setupEqualizer();
 	bool isAudioExtension(const QString& filename);
 void drawEqualizer(QPainter &painter);
-//void paintEvent(QPaintEvent *event) override;
 void onFramePaint();
 bool eventFilter(QObject *watched, QEvent *event);
 private slots:
@@ -91,12 +88,6 @@ private:
 	   QWidget *m_equalizerWidget;
 		  bool m_equalizerActive;
 		  QVector<int> m_equalizerLevels;
-
-		  // Методы для эквалайзера
-
-
-
-
 
 };
 #endif // MAINWINDOW_H
